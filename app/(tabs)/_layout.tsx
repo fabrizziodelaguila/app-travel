@@ -53,13 +53,14 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-        name="bookmarks"
+        name="chatbot"
         options={{
           tabBarIcon: ({ color }) => (
-            <Ionicons name="bookmark" size={28} color={color} />
+            <Ionicons name="chatbubble-outline" size={28} color={color} />
           ),
         }}
       />
+
       <Tabs.Screen
         name="profile"
         options={{
