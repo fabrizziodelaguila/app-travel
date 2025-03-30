@@ -62,7 +62,7 @@ export default function Layout() {
       />
 
       <Tabs.Screen
-        name="profile"
+        name="login"
         options={{
           tabBarIcon: ({ color }) => (
             <FontAwesome name="user" size={28} color={color} />

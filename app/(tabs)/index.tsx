@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -16,9 +16,11 @@ import Listings from "@/components/Listings";
 import GroupListings from "@/components/GroupListings";
 import { VueloType } from "@/types/vueloType";
 import debounce from "lodash/debounce";
-import { API_URLS } from '@/config/config'; // Apunta a config/config.ts
+import { API_URLS } from "@/config/config"; // Apunta a config/config.ts
+import { UserContext } from "../context/UserContext";
 
 const Page = () => {
+  const { username } = useContext(UserContext);
   const headerHeight = useHeaderHeight();
   const [category, setCategory] = useState("All");
   const [listings, setListings] = useState<any[]>([]);
@@ -97,21 +99,25 @@ const Page = () => {
           headerTransparent: true,
           headerTitle: "",
           headerRight: () => (
-            <TouchableOpacity
-              onPress={() => {}}
-              style={{
-                marginRight: 20,
-                backgroundColor: Colors.white,
-                padding: 10,
-                borderRadius: 10,
-                shadowColor: "#171717",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.2,
-                shadowRadius: 3,
-              }}
-            >
-              <Ionicons name="notifications" size={20} color={Colors.black} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row", alignItems: "center", marginRight: 20 }}>
+              <Text style={{ marginRight: 10, fontWeight: "bold", color: Colors.black }}>
+                {username}
+              </Text>
+              <View
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  backgroundColor: Colors.primaryColor,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: Colors.white, fontWeight: "bold" }}>
+                  {username[0]?.toUpperCase()}
+                </Text>
+              </View>
+            </View>
           ),
         }}
       />
