@@ -6,6 +6,7 @@ import {
   Button,
   StyleSheet,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { UserContext } from '../context/UserContext';
@@ -19,7 +20,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.5:5000/login', {
+      const response = await fetch('https://loginapi-efcefzbjctcrbcax.canadacentral-01.azurewebsites.net/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,79 +43,124 @@ const Login = () => {
     }
   };
 
-    const handleRegister = async () => {
-        try {
-            const response = await fetch('http://192.168.0.5:5000/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
+  const handleRegister = async () => {
+    try {
+      const response = await fetch('https://loginapi-efcefzbjctcrbcax.canadacentral-01.azurewebsites.net/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-            const data = await response.json();
+      const data = await response.json();
 
-            if (response.ok) {
-                Alert.alert('Registro exitoso', 'Ahora puedes iniciar sesión');
-                setIsRegistering(false); // Cambiar a la vista de inicio de sesión
-            } else {
-                Alert.alert('Error', data.error || 'Error al registrarse');
-            }
-        } catch (error) {
-            console.error('Error en registro:', error);
-            Alert.alert('Error', 'No se pudo conectar con el servidor');
-        }
-    };
+      if (response.ok) {
+        Alert.alert('Registro exitoso', 'Ahora puedes iniciar sesión');
+        setIsRegistering(false); // Cambiar a la vista de inicio de sesión
+      } else {
+        Alert.alert('Error', data.error || 'Error al registrarse');
+      }
+    } catch (error) {
+      console.error('Error en registro:', error);
+      Alert.alert('Error', 'No se pudo conectar con el servidor');
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        {isRegistering ? 'Registrarse' : 'Iniciar Sesión'}
-      </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Usuario"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      {isRegistering ? (
-        <Button title="Registrarse" onPress={handleRegister} />
-      ) : (
-        <Button title="Iniciar Sesión" onPress={handleLogin} />
-      )}
-      <Button
-        title={isRegistering ? 'Volver a Iniciar Sesión' : 'Registrarse'}
-        onPress={() => setIsRegistering(!isRegistering)}
-      />
+    <View style={styles.body}>
+      <View style={styles.container}>
+        <Text style={styles.title}>
+          {isRegistering ? 'Registrarse' : 'Iniciar Sesión'}
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Usuario"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        {isRegistering ? (
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Registrarse</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Iniciar Sesión</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          onPress={() => setIsRegistering(!isRegistering)}
+          style={styles.grayText}
+        >
+          <Text>
+            {isRegistering
+              ? 'Volver a Iniciar Sesión'
+              : '¿No tienes cuenta? Registrarse'}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  body: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f4f4f4',
+  },
+  container: {
+    backgroundColor: 'white',
     padding: 20,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 3, // For Android shadow
+    textAlign: 'center',
+    width: 300,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 15,
     textAlign: 'center',
   },
   input: {
+    width: '90%',
+    padding: 10,
+    marginVertical: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 10,
     borderRadius: 5,
+    alignSelf: 'center',
+  },
+  button: {
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#28a745',
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  grayText: {
+    color: 'gray',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
 
