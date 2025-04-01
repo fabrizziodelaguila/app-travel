@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -6,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState, useEffect, useCallback, useContext } from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -16,12 +16,16 @@ import Listings from "@/components/Listings";
 import GroupListings from "@/components/GroupListings";
 import { VueloType } from "@/types/vueloType";
 import debounce from "lodash/debounce";
-import { API_URLS } from "@/config/config"; // Apunta a config/config.ts
+import { API_URLS } from "@/config/config";
 import { UserContext } from "../context/UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import AuthMiddleware from "../context/authMiddleware"; // Importar el middleware
 
 const Page = () => {
   const { username } = useContext(UserContext);
   const headerHeight = useHeaderHeight();
+  const router = useRouter();
   const [category, setCategory] = useState("All");
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +41,6 @@ const Page = () => {
     setCategory(category);
   };
 
-  // Función genérica para hacer solicitudes HTTP
   const fetchData = async (
     url: string,
     setData: (data: any) => void,
@@ -54,17 +57,14 @@ const Page = () => {
     }
   };
 
-  // Obtener destinos
   useEffect(() => {
     fetchData(API_URLS.DESTINOS, setListings, setLoading);
   }, []);
 
-  // Obtener vuelos
   useEffect(() => {
     fetchData(API_URLS.VUELOS, setVuelos, setLoadingVuelos);
   }, []);
 
-  // Función para buscar destinos
   const fetchSearchResults = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -84,7 +84,6 @@ const Page = () => {
     }
   };
 
-  // Debounce de la búsqueda
   const debouncedSearch = useCallback(debounce(fetchSearchResults, 500), []);
 
   const handleSearchTextChange = (text: string) => {
@@ -92,8 +91,13 @@ const Page = () => {
     debouncedSearch(text);
   };
 
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("token"); // Eliminar el token
+    router.push("/login"); // Redirigir al login
+  };
+
   return (
-    <>
+    <AuthMiddleware>
       <Stack.Screen
         options={{
           headerTransparent: true,
@@ -117,6 +121,9 @@ const Page = () => {
                   {username[0]?.toUpperCase()}
                 </Text>
               </View>
+              <TouchableOpacity onPress={handleLogout} style={{ marginLeft: 10 }}>
+                <Ionicons name="log-out-outline" size={24} color={Colors.primaryColor} />
+              </TouchableOpacity>
             </View>
           ),
         }}
@@ -158,7 +165,7 @@ const Page = () => {
           <GroupListings listings={vuelos} />
         </ScrollView>
       </View>
-    </>
+    </AuthMiddleware>
   );
 };
 
